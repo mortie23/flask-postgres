@@ -1,0 +1,7 @@
+psycopg2
+python-dotenv
+Flask
+Flask-SQLAlchemy
+Flask-Migrate
+black
+mypy

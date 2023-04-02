@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>ToDo App</title>
+  </head>
+  <body>
+    <h1>ToDo App</h1>
+    <form action="/add" method="post">
+      <input type="text" name="todo" placeholder="Enter a todo" />
+      <input type="submit" value="Add" />
+    </form>
+    <table>
+      <tr>
+        <th>ID</th>
+        <th>ToDo</th>
+      </tr>
+      {% for todo in todos %}
+      <tr>
+        <td>{{ todo.id }}</td>
+        <td>{{ todo.todo }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </body>
+</html>
