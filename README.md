@@ -1,12 +1,12 @@
-# Flask app connected to PostGres on remote machine
+# Flask app with a Postgres database containerized across multiple clouds
 
 ## Background
 
-We are building out an application that has a decoupled RDBMS from a Front end in a multi cloud environment. We want the front end to be containerised.
+We are building out an application that has a decoupled RDBMS from a Front end in a multi cloud environment. We also want the front end to be containerized so that all the code and all its dependencies are packaged up and the application runs quickly and reliably regardless of the computing environment (development on client machine and on remote cloud hosting in production).
 
-![](./img/architecture.png)
+![](./img/flask-postgres-architecture.png)
 
-The choice atchitecture for this demonstration will be:
+The choice architecture for this demonstration will be:
 
 1. A self managed Postgres database on one cloud platform (GCP)
 1. A self managed web server on a different cloud platform (AWS)
@@ -26,15 +26,15 @@ To get started with local development, we need to add a firewall rule such that 
 
 In the GCP console, we create a new firewall rule.
 
-![](./img/gcp-vpc-firewall-create.png)
+![](./img/flask-postgres-gcp-vpc-firewall-create.png)
 
 In this example we name it _postgres_ and the protocol/port is `tcp:5432` (the default port for Postgres). The Target (tag) will be the tag we have used for the Compute engine.
 
-![](./img/gcp-vpc-firewall-postgres.png)
+![](./img/flask-postgres-gcp-vpc-firewall-postgres.png)
 
 Then, after finding out what our public IP address is (you can just ask Google _what is my ip address_) we allow our IP address through the firewall.
 
-![](./img/gcp-vpc-firewall-postgres-tag-ip.png)
+![](./img/flask-postgres-gcp-vpc-firewall-postgres-tag-ip.png)
 
 You will notice there is a second IP address allowed through the firewall. This is the web server machine's IP address which will be discussed later in the blog post.
 
@@ -45,7 +45,7 @@ I am using a Windows machine with:
 - WSL 2 (Ubuntu 20.04)
 - Python 3.8.10
 
-![](./img/machine-windows-wsl.png)
+![](./img/flask-postgres-machine-windows-wsl.png)
 
 To get started there is an OS dependency we need to install:
 
@@ -111,7 +111,7 @@ INFO  [alembic.runtime.migration] Will assume transactional DDL.
 INFO  [alembic.runtime.migration] Running upgrade 812916de9ad7 -> bc12dad5cf64, empty message
 ```
 
-![](./img/postgres-todo-table.png)
+![](./img/flask-postgres-postgres-todo-table.png)
 
 ## Run the Flask application in development
 
@@ -136,9 +136,9 @@ Press CTRL+C to quit
 
 With a sample item in the todo, we can test that the appliction is writing to the cloud IaaS Postgres instance.
 
-![](./img/flask-app-1-todo.png)
+![](./img/flask-postgres-flask-app-1-todo.png)
 
-![](./img/postgres-todo-table-data.png)
+![](./img/flask-postgres-postgres-todo-table-data.png)
 
 ## Deploy the application
 
@@ -199,7 +199,7 @@ docker run --env APP_SETTINGS --env DATABASE_URL -p 5000:5000 mortimerxyz/flaskp
 [2023-04-02 01:40:51 +0000] [8] [INFO] Booting worker with pid: 8
 ```
 
-![](./img/flask-app-from-docker.png)
+![](./img/flask-postgres-flask-app-from-docker.png)
 
 ### Stop the running container
 
@@ -225,17 +225,17 @@ We now need to push the image to a container registry so we can pull it from our
 docker push mortimerxyz/flaskpostgrestodo:0.1
 ```
 
-![](./img/dockerhub-publish-image.png)
+![](./img/flask-postgres-dockerhub-publish-image.png)
 
 ### Use the Docker image to deploy application
 
 We are going to use a basic EC2 machine to host the web application.
 To enable us to SSH to the machine we will need to add a firewall rule to allow SSH over port 22 to our public IP address:  
-![](./img/aws-ec2-sgr-localip.png)
+![](./img/flask-postgres-aws-ec2-sgr-localip.png)
 
 We will also need to add the public IP address of the EC2 machine to the firewall for the GCP machine that is hosting the Postgres database service:
 
-![](./img/aws-ec2-public-ip.png)
+![](./img/flask-postgres-aws-ec2-public-ip.png)
 
 First we will start with pulling the Docker image down from where we published it to Docker hub.
 
@@ -292,4 +292,4 @@ location / {
 
 Now when we browse to the domain name we get the running Flask application.
 
-![](./img/aws-docker-flask.png)
+![](./img/flask-postgres-aws-docker-flask.png)
